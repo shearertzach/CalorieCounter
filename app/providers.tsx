@@ -8,12 +8,14 @@ interface SupabaseContextType {
   user: User | null;
   loading: boolean;
   signOut: () => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
 }
 
 const SupabaseContext = createContext<SupabaseContextType>({
   user: null,
   loading: true,
   signOut: async () => {},
+  signInWithGoogle: async () => {},
 });
 
 export const useSupabase = () => {
@@ -58,8 +60,27 @@ export default function Providers({ children }: ProvidersProps) {
     await supabase.auth.signOut();
   };
 
+  const signInWithGoogle = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}`
+        }
+      });
+      
+      if (error) {
+        console.error('Error signing in with Google:', error);
+        throw error;
+      }
+    } catch (error) {
+      console.error('Google sign in error:', error);
+      throw error;
+    }
+  };
+
   return (
-    <SupabaseContext.Provider value={{ user, loading, signOut }}>
+    <SupabaseContext.Provider value={{ user, loading, signOut, signInWithGoogle }}>
       {children}
     </SupabaseContext.Provider>
   );
