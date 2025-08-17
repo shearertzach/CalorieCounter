@@ -5,17 +5,38 @@ import { AuthGuard, Header, StatsGrid, MainContent, MealList, DashboardHeader, F
 import { useFoodCatalog } from './hooks/useFoodCatalog';
 import { useMealTracker } from './hooks/useMealTracker';
 import { useUserSettings } from './hooks/useUserSettings';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import DailyFoodLog from './components/data/DailyFoodLog';
 import { createClient } from '../lib/supabase';
 import LoadingSpinner from './components/ui/LoadingSpinner';
 import LandingPage from './components/layout/LandingPage';
 
+// Component that handles OAuth completion - needs to be separate for Suspense
+function OAuthHandler() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const handleOAuthCompletion = async () => {
+      const accessToken = searchParams.get('access_token');
+      const refreshToken = searchParams.get('refresh_token');
+      
+      if (accessToken && refreshToken) {
+        // Clear the URL parameters
+        router.replace('/', { scroll: false });
+      }
+    };
+
+    handleOAuthCompletion();
+  }, [searchParams, router]);
+
+  return null; // This component doesn't render anything
+}
+
 export default function Home() {
   const { user, loading } = useSupabase();
   const router = useRouter();
-  const searchParams = useSearchParams();
   
   const {
     catalogItems,
@@ -162,20 +183,6 @@ export default function Home() {
     }
   };
 
-  // Handle OAuth completion if user lands here with auth parameters
-  useEffect(() => {
-    const handleOAuthCompletion = async () => {
-      const accessToken = searchParams.get('access_token');
-      const refreshToken = searchParams.get('refresh_token');
-      
-      if (accessToken && refreshToken) {
-        // Clear the URL parameters
-        router.replace('/', { scroll: false });
-      }
-    };
-
-    handleOAuthCompletion();
-  }, [searchParams, router]);
 
   // Show loading state while checking authentication
   if (loading) {
@@ -190,6 +197,9 @@ export default function Home() {
   // If authenticated, show the main app
   return (
     <AuthGuard>
+      <Suspense fallback={null}>
+        <OAuthHandler />
+      </Suspense>
       <div className="min-h-screen bg-gray-50 animate-fadeIn">
         <Header />
         
