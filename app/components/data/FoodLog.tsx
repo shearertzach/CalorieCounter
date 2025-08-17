@@ -1,4 +1,4 @@
-import { FoodEntry } from '../types';
+import { FoodEntry } from '../../types';
 
 interface FoodLogProps {
   entries: FoodEntry[];

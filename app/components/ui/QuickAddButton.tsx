@@ -14,10 +14,10 @@ export default function QuickAddButton({ onAddFood, onAddMeal, isVisible }: Quic
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-6 right-6 z-50 animate-slideInRight">
       {/* Expanded Menu */}
       {isExpanded && (
-        <div className="absolute bottom-16 right-0 mb-2 space-y-3">
+        <div className="absolute bottom-16 right-0 mb-2 space-y-3 animate-slideInUp stagger-children">
           <button
             onClick={() => {
               router.push('/catalog');
@@ -53,7 +53,7 @@ export default function QuickAddButton({ onAddFood, onAddMeal, isVisible }: Quic
       {/* Main Button */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className={`w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-110 ${
+        className={`w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 animate-bounce ${
           isExpanded ? 'rotate-45' : ''
         }`}
       >

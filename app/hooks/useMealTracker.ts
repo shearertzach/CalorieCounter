@@ -229,8 +229,8 @@ export function useMealTracker() {
     }
   };
 
-  const updateMeal = async (mealId: string, mealData: CreateMealData) => {
-    if (!user) return;
+  const updateMeal = async (mealId: string, mealData: CreateMealData): Promise<boolean> => {
+    if (!user) return false;
 
     try {
       // Update meal basic info
@@ -245,7 +245,7 @@ export function useMealTracker() {
 
       if (mealError) {
         console.error('Error updating meal:', mealError);
-        return;
+        return false;
       }
 
       // Delete existing meal foods
@@ -256,7 +256,7 @@ export function useMealTracker() {
 
       if (deleteError) {
         console.error('Error deleting meal foods:', deleteError);
-        return;
+        return false;
       }
 
       // Add new meal foods
@@ -273,7 +273,7 @@ export function useMealTracker() {
 
         if (mealFoodsError) {
           console.error('Error updating meal foods:', mealFoodsError);
-          return;
+          return false;
         }
       }
 
@@ -330,8 +330,10 @@ export function useMealTracker() {
       };
 
       loadMeals();
+      return true;
     } catch (error) {
       console.error('Error updating meal:', error);
+      return false;
     }
   };
 

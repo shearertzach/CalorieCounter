@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FoodCatalogItem, CreateMealData } from '../types';
+import { FoodCatalogItem, CreateMealData } from '../../types';
 
 interface MealFormProps {
   isOpen: boolean;

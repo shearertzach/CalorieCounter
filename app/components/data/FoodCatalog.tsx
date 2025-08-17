@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FoodCatalogItem, CreateFoodCatalogItemData } from '../types';
+import { FoodCatalogItem, CreateFoodCatalogItemData } from '../../types';
 
 interface FoodCatalogProps {
   catalogItems: FoodCatalogItem[];

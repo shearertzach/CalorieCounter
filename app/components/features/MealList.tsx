@@ -1,6 +1,6 @@
 'use client';
 
-import { Meal } from '../types';
+import { Meal } from '../../types';
 
 interface MealListProps {
   meals: Meal[];
