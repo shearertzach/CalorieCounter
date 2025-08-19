@@ -52,6 +52,23 @@ export default function AppPreferences({ preferences, onSave, saving }: AppPrefe
           <p className="text-xs text-gray-500 mt-1">Choose your preferred app appearance</p>
         </div>
 
+        {/* Unit System Settings */}
+        <div>
+          <label htmlFor="unit_system" className="block text-sm font-medium text-gray-700 mb-2">
+            Unit System
+          </label>
+          <select
+            id="unit_system"
+            value={formData.unit_system}
+            onChange={(e) => handleInputChange('unit_system', e.target.value as 'metric' | 'imperial')}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
+          >
+            <option value="imperial">Imperial (ft/in, lbs, oz)</option>
+            <option value="metric">Metric (cm, kg, g)</option>
+          </select>
+          <p className="text-xs text-gray-500 mt-1">Choose your preferred measurement units</p>
+        </div>
+
         {/* Notification Settings */}
         <div className="space-y-4">
           <h4 className="text-sm font-medium text-gray-900">Notifications</h4>

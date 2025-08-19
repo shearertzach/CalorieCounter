@@ -1,20 +1,56 @@
 'use client';
 
-import { useState } from 'react';
-import type { UserProfile } from '../../hooks/useUserSettings';
+import { useState, useEffect } from 'react';
+import type { UserProfile, AppPreferences } from '../../hooks/useUserSettings';
+import { getDisplayWeight, getDisplayHeight, parseWeightInput, parseHeightInput, getWeightUnit, getHeightUnits } from '../../../lib/units';
 
 interface ProfileSettingsProps {
   profile: UserProfile;
   onSave: (profile: Partial<UserProfile>) => Promise<boolean>;
   saving: boolean;
+  unitSystem: AppPreferences['unit_system'];
 }
 
-export default function ProfileSettings({ profile, onSave, saving }: ProfileSettingsProps) {
+export default function ProfileSettings({ profile, onSave, saving, unitSystem }: ProfileSettingsProps) {
   const [formData, setFormData] = useState<UserProfile>(profile);
   const [showSuccess, setShowSuccess] = useState(false);
+  
+  // Imperial-specific state for height input
+  const [heightFeet, setHeightFeet] = useState('');
+  const [heightInches, setHeightInches] = useState('');
+  const [displayWeight, setDisplayWeight] = useState('');
+
+  // Initialize display values when profile or unit system changes
+  useEffect(() => {
+    if (unitSystem === 'imperial') {
+      const heightDisplay = getDisplayHeight(formData.height, unitSystem);
+      setHeightFeet(heightDisplay.feet);
+      setHeightInches(heightDisplay.inches);
+      setDisplayWeight(getDisplayWeight(formData.weight, unitSystem));
+    }
+  }, [formData.height, formData.weight, unitSystem]);
 
   const handleInputChange = (field: keyof UserProfile, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+  
+  const handleWeightChange = (value: string) => {
+    setDisplayWeight(value);
+    const weightKg = parseWeightInput(value, unitSystem);
+    if (weightKg !== undefined) {
+      setFormData(prev => ({ ...prev, weight: weightKg }));
+    }
+  };
+  
+  const handleHeightChange = (feet: string, inches: string) => {
+    setHeightFeet(feet);
+    setHeightInches(inches);
+    if (unitSystem === 'imperial') {
+      const heightCm = parseHeightInput(feet, inches);
+      if (heightCm !== undefined) {
+        setFormData(prev => ({ ...prev, height: heightCm }));
+      }
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -84,34 +120,71 @@ export default function ProfileSettings({ profile, onSave, saving }: ProfileSett
           </div>
 
           <div>
-            <label htmlFor="height" className="block text-sm font-medium text-gray-700 mb-2">
-              Height (cm)
-            </label>
-            <input
-              type="number"
-              id="height"
-              value={formData.height || ''}
-              onChange={(e) => handleInputChange('height', e.target.value ? parseInt(e.target.value) : undefined)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500 bg-white"
-              placeholder="170"
-              min="100"
-              max="250"
-            />
+            {unitSystem === 'imperial' ? (
+              <>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Height (ft/in)
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <input
+                      type="number"
+                      value={heightFeet}
+                      onChange={(e) => handleHeightChange(e.target.value, heightInches)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500 bg-white"
+                      placeholder="5"
+                      min="0"
+                      max="8"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Feet</p>
+                  </div>
+                  <div>
+                    <input
+                      type="number"
+                      value={heightInches}
+                      onChange={(e) => handleHeightChange(heightFeet, e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500 bg-white"
+                      placeholder="10"
+                      min="0"
+                      max="11.9"
+                      step="0.1"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Inches</p>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <label htmlFor="height" className="block text-sm font-medium text-gray-700 mb-2">
+                  Height (cm)
+                </label>
+                <input
+                  type="number"
+                  id="height"
+                  value={formData.height || ''}
+                  onChange={(e) => handleInputChange('height', e.target.value ? parseFloat(e.target.value) : undefined)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500 bg-white"
+                  placeholder="170"
+                  min="100"
+                  max="250"
+                />
+              </>
+            )}
           </div>
 
           <div>
             <label htmlFor="weight" className="block text-sm font-medium text-gray-700 mb-2">
-              Weight (kg)
+              Weight ({getWeightUnit(unitSystem)})
             </label>
             <input
               type="number"
               id="weight"
-              value={formData.weight || ''}
-              onChange={(e) => handleInputChange('weight', e.target.value ? parseFloat(e.target.value) : undefined)}
+              value={unitSystem === 'imperial' ? displayWeight : (formData.weight || '')}
+              onChange={(e) => unitSystem === 'imperial' ? handleWeightChange(e.target.value) : handleInputChange('weight', e.target.value ? parseFloat(e.target.value) : undefined)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500 bg-white"
-              placeholder="70"
-              min="30"
-              max="300"
+              placeholder={unitSystem === 'imperial' ? '154' : '70'}
+              min={unitSystem === 'imperial' ? '66' : '30'}
+              max={unitSystem === 'imperial' ? '661' : '300'}
               step="0.1"
             />
           </div>

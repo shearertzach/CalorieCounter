@@ -102,6 +102,7 @@ export default function SettingsPage() {
                 profile={profile}
                 onSave={saveProfile}
                 saving={saving}
+                unitSystem={appPreferences.unit_system}
               />
             )}
 

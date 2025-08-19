@@ -32,6 +32,7 @@ export interface AppPreferences {
   notifications: boolean;
   weekly_reports: boolean;
   reminder_time?: string;
+  unit_system: 'metric' | 'imperial';
 }
 
 export function useUserSettings(user: User | null) {
@@ -45,7 +46,8 @@ export function useUserSettings(user: User | null) {
   const [appPreferences, setAppPreferences] = useState<AppPreferences>({
     theme: 'system',
     notifications: true,
-    weekly_reports: false
+    weekly_reports: false,
+    unit_system: 'imperial'
   });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -182,7 +184,8 @@ export function useUserSettings(user: User | null) {
           theme: data.theme || 'system',
           notifications: data.notifications ?? true,
           weekly_reports: data.weekly_reports ?? false,
-          reminder_time: data.reminder_time
+          reminder_time: data.reminder_time,
+          unit_system: data.unit_system || 'imperial'
         });
       }
     } catch (error) {
@@ -307,6 +310,7 @@ export function useUserSettings(user: User | null) {
             notifications: preferences.notifications,
             weekly_reports: preferences.weekly_reports,
             reminder_time: preferences.reminder_time,
+            unit_system: preferences.unit_system,
             updated_at: new Date().toISOString()
           })
           .eq('user_id', user.id);
@@ -319,7 +323,8 @@ export function useUserSettings(user: User | null) {
             theme: preferences.theme,
             notifications: preferences.notifications,
             weekly_reports: preferences.weekly_reports,
-            reminder_time: preferences.reminder_time
+            reminder_time: preferences.reminder_time,
+            unit_system: preferences.unit_system
           });
       }
 
@@ -340,6 +345,7 @@ export function useUserSettings(user: User | null) {
 
   // Calculate recommended nutrition goals based on profile
   const calculateRecommendedGoals = (): NutritionGoals => {
+
     if (!profile || !profile.age || !profile.weight || !profile.height || !profile.gender || !profile.activity_level) {
       return nutritionGoals;
     }

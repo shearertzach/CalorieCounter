@@ -39,7 +39,7 @@ export default function NutritionGoals({ goals, onSave, onCalculateRecommended, 
           <h3 className="text-lg font-semibold text-gray-900">Daily Nutrition Goals</h3>
           <button
             type="button"
-            onClick={handleCalculateRecommended}
+            onClick={() => handleCalculateRecommended()}
             className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors duration-200"
           >
             Calculate Recommended
